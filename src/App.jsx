@@ -103,6 +103,19 @@ export default function App() {
     showToast('Recurring rule removed');
   };
 
+  const handleAddCustomCategory = (type, categoryName) => {
+    const existingCustom = appData.customCategories || { expense: [], income: [] };
+    const currentList = existingCustom[type] || [];
+    if (!currentList.includes(categoryName)) {
+      const updatedCustom = {
+        ...existingCustom,
+        [type]: [...currentList, categoryName]
+      };
+      saveState({ ...appData, customCategories: updatedCustom });
+      showToast(`Added custom ${type} category: ${categoryName}`);
+    }
+  };
+
   // Compute dashboard transactions filtered by account selection (all, bank, cash)
   const dashboardTransactions = appData.transactions.filter(t => {
     const method = normalizePaymentMethod(t.paymentMethod);
@@ -148,6 +161,7 @@ export default function App() {
             <TransactionsView
               transactions={appData.transactions}
               currency={currency}
+              customCategories={appData.customCategories}
               onDeleteTx={handleDeleteTx}
             />
           )}
@@ -204,6 +218,8 @@ export default function App() {
         onClose={() => setIsAddTxOpen(false)}
         onSave={handleAddTx}
         currency={currency}
+        customCategories={appData.customCategories}
+        onAddCustomCategory={handleAddCustomCategory}
       />
 
       <AddBudgetModal

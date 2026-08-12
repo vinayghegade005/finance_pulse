@@ -3,7 +3,7 @@ import { Search, Trash2, Landmark, Banknote, Layers } from 'lucide-react';
 import { DEFAULT_CATEGORIES, FinanceStore } from '../utils/store';
 import { formatDateDDMMYYYY, normalizePaymentMethod } from '../utils/formatters';
 
-export default function TransactionsView({ transactions, currency = '₹', onDeleteTx }) {
+export default function TransactionsView({ transactions, currency = '₹', customCategories, onDeleteTx }) {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'bank', 'cash'
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
@@ -11,10 +11,13 @@ export default function TransactionsView({ transactions, currency = '₹', onDel
 
   const accountMetrics = FinanceStore.getAccountMetrics(transactions);
 
-  const allCategories = [
+  const defaultCategories = [
     ...DEFAULT_CATEGORIES.expense.map(c => c.name),
     ...DEFAULT_CATEGORIES.income.map(c => c.name)
   ];
+  const customExpense = (customCategories && customCategories.expense) || [];
+  const customIncome = (customCategories && customCategories.income) || [];
+  const allCategories = Array.from(new Set([...defaultCategories, ...customExpense, ...customIncome]));
 
   const filtered = transactions.filter(t => {
     const method = normalizePaymentMethod(t.paymentMethod);
