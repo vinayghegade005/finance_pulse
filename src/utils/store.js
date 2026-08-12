@@ -6,21 +6,21 @@ const STORAGE_KEY = 'finance_pulse_db_v2';
 
 export const DEFAULT_CATEGORIES = {
   expense: [
-    { name: 'Housing & Rent', color: '#6366f1' },
+    { name: 'Housing & Rent', color: '#059669' },
     { name: 'Groceries & Dining', color: '#10b981' },
-    { name: 'Transport & Fuel', color: '#0ea5e9' },
-    { name: 'Utilities & Bills', color: '#f59e0b' },
-    { name: 'Entertainment & Subs', color: '#ec4899' },
-    { name: 'Shopping & Clothes', color: '#8b5cf6' },
+    { name: 'Transport & Fuel', color: '#14b8a6' },
+    { name: 'Utilities & Bills', color: '#047857' },
+    { name: 'Entertainment & Subs', color: '#34d399' },
+    { name: 'Shopping & Clothes', color: '#0f766e' },
     { name: 'Health & Medical', color: '#f43f5e' },
-    { name: 'Other Expenses', color: '#64748b' }
+    { name: 'Other Expenses', color: '#4b5563' }
   ],
   income: [
     { name: 'Salary & Wages', color: '#10b981' },
-    { name: 'Freelance & Projects', color: '#0ea5e9' },
-    { name: 'Investments & Dividends', color: '#6366f1' },
-    { name: 'Gifts & Bonuses', color: '#f59e0b' },
-    { name: 'Other Income', color: '#8b5cf6' }
+    { name: 'Freelance & Projects', color: '#34d399' },
+    { name: 'Investments & Dividends', color: '#059669' },
+    { name: 'Gifts & Bonuses', color: '#14b8a6' },
+    { name: 'Other Income', color: '#047857' }
   ]
 };
 
