@@ -3,45 +3,45 @@
    ========================================================================== */
 
 :root {
-  /* Dark Theme Palette Default */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-surface: #1e293b;
-  --bg-surface-hover: #334155;
-  --bg-card: rgba(30, 41, 59, 0.75);
-  --bg-modal: #1e293b;
+  /* Subtle Black & Green Theme Palette */
+  --bg-primary: #0a0e0b;
+  --bg-secondary: #111713;
+  --bg-surface: #131c15;
+  --bg-surface-hover: #1c2920;
+  --bg-card: rgba(19, 28, 21, 0.85);
+  --bg-modal: #131c15;
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-color-hover: rgba(255, 255, 255, 0.18);
+  --border-color: rgba(34, 197, 94, 0.12);
+  --border-color-hover: rgba(34, 197, 94, 0.28);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #f0fdf4;
+  --text-secondary: #a7f3d0;
+  --text-muted: #648374;
 
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
-  --accent-primary-light: rgba(99, 102, 241, 0.15);
+  --accent-primary: #10b981;
+  --accent-primary-hover: #059669;
+  --accent-primary-light: rgba(16, 185, 129, 0.14);
 
   --accent-income: #10b981;
   --accent-income-hover: #059669;
-  --accent-income-light: rgba(16, 185, 129, 0.15);
+  --accent-income-light: rgba(16, 185, 129, 0.14);
 
   --accent-expense: #f43f5e;
   --accent-expense-hover: #e11d48;
-  --accent-expense-light: rgba(244, 63, 94, 0.15);
+  --accent-expense-light: rgba(244, 63, 94, 0.14);
 
-  --accent-warning: #f59e0b;
-  --accent-warning-light: rgba(245, 158, 11, 0.15);
+  --accent-warning: #d97706;
+  --accent-warning-light: rgba(217, 119, 6, 0.14);
 
-  --accent-info: #0ea5e9;
-  --accent-info-light: rgba(14, 165, 233, 0.15);
+  --accent-info: #14b8a6;
+  --accent-info-light: rgba(20, 184, 166, 0.14);
 
   /* Shadows & Effects */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-  --glass-bg: rgba(30, 41, 59, 0.65);
-  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(19, 28, 21, 0.75);
+  --glass-border: 1px solid rgba(34, 197, 94, 0.14);
   --backdrop-blur: blur(12px);
 
   /* Layout Constants */
@@ -58,23 +58,23 @@
 }
 
 [data-theme="light"] {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #f1f5f9;
+  --bg-primary: #f2f7f4;
+  --bg-secondary: #e6efe9;
   --bg-surface: #ffffff;
-  --bg-surface-hover: #f1f5f9;
-  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-surface-hover: #e6efe9;
+  --bg-card: rgba(255, 255, 255, 0.9);
   --bg-modal: #ffffff;
 
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-color-hover: rgba(0, 0, 0, 0.15);
+  --border-color: rgba(16, 185, 129, 0.15);
+  --border-color-hover: rgba(16, 185, 129, 0.3);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #092014;
+  --text-secondary: #2d5a40;
+  --text-muted: #5e8470;
 
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: 1px solid rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: 1px solid rgba(16, 185, 129, 0.15);
+  --shadow-lg: 0 10px 25px -5px rgba(16, 185, 129, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 }
 
 *, *::before, *::after {
@@ -133,12 +133,12 @@ h1, h2, h3, h4, h5, h6 {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+  background: linear-gradient(135deg, #10b981, #047857);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .brand-title {
@@ -211,14 +211,14 @@ h1, h2, h3, h4, h5, h6 {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+  background: linear-gradient(135deg, #10b981, #047857);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.85rem;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
 
 .theme-toggle-btn {
@@ -295,14 +295,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
 
 .btn-success {
@@ -720,7 +720,7 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 500;
   padding: 12px 22px;
   border-radius: var(--radius-full);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
   font-size: 0.95rem;
   font-weight: 600;
   display: flex;
@@ -731,7 +731,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .fab-add-btn:hover {
   transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
 }
 
 /* Toast */

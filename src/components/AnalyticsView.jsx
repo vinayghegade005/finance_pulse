@@ -7,14 +7,14 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function AnalyticsView({ transactions, theme, currency = '₹' }) {
   const isDark = theme !== 'light';
-  const textColor = isDark ? '#f8fafc' : '#0f172a';
+  const textColor = isDark ? '#f0fdf4' : '#092014';
 
   const breakdown = FinanceStore.getCategoryBreakdown(transactions, 'expense');
   const totalExpense = breakdown.reduce((sum, b) => sum + b.amount, 0);
 
   const donutLabels = breakdown.map(b => b.category);
   const donutAmounts = breakdown.map(b => b.amount);
-  const colors = ['#6366f1', '#10b981', '#0ea5e9', '#f59e0b', '#ec4899', '#8b5cf6', '#f43f5e', '#64748b'];
+  const colors = ['#10b981', '#34d399', '#059669', '#14b8a6', '#047857', '#0f766e', '#648374', '#4b5563'];
 
   const donutData = {
     labels: donutLabels,
