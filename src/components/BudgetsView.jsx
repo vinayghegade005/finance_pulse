@@ -2,7 +2,7 @@ import React from 'react';
 import { Plus, AlertTriangle } from 'lucide-react';
 import { FinanceStore } from '../utils/store';
 
-export default function BudgetsView({ budgets, transactions, onOpenAddBudget }) {
+export default function BudgetsView({ budgets, transactions, currency = '₹', onOpenAddBudget }) {
   const budgetProgress = FinanceStore.getBudgetsWithProgress(budgets, transactions);
 
   return (
@@ -37,8 +37,8 @@ export default function BudgetsView({ budgets, transactions, onOpenAddBudget }) 
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Spent: <strong>₹{b.spent.toFixed(2)}</strong></span>
-                  <span style={{ color: 'var(--text-muted)' }}>Limit: <strong>₹{b.limit.toFixed(2)}</strong></span>
+                  <span style={{ color: 'var(--text-muted)' }}>Spent: <strong>{currency}{b.spent.toFixed(2)}</strong></span>
+                  <span style={{ color: 'var(--text-muted)' }}>Limit: <strong>{currency}{b.limit.toFixed(2)}</strong></span>
                 </div>
 
                 <div className="progress-bar-bg">
@@ -48,10 +48,10 @@ export default function BudgetsView({ budgets, transactions, onOpenAddBudget }) 
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   {b.status === 'exceeded' ? (
                     <span style={{ color: 'var(--accent-expense)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <AlertTriangle size={14} /> Exceeded budget cap by ₹{(b.spent - b.limit).toFixed(2)}
+                      <AlertTriangle size={14} /> Exceeded budget cap by {currency}{(b.spent - b.limit).toFixed(2)}
                     </span>
                   ) : (
-                    `Remaining budget: ₹${b.remaining.toFixed(2)}`
+                    `Remaining budget: ${currency}${b.remaining.toFixed(2)}`
                   )}
                 </div>
               </div>

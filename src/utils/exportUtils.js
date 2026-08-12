@@ -1,22 +1,20 @@
-/* ==========================================================================
-   FINANCEPULSE - CSV AND JSON EXPORT/IMPORT UTILITIES
-   ========================================================================== */
+import { formatDateDDMMYYYY, normalizePaymentMethod } from './formatters';
 
-export function exportToCSV(transactions, filename = 'finance_pulse_report.csv') {
+export function exportToCSV(transactions, currency = '₹', filename = 'finance_pulse_report.csv') {
   if (!transactions || transactions.length === 0) {
     alert("No transactions available to export.");
     return;
   }
 
-  const headers = ['ID', 'Date', 'Type', 'Category', 'Amount (₹)', 'Payment Method', 'Description', 'Tags'];
+  const headers = ['ID', 'Date', 'Type', 'Category', `Amount (${currency})`, 'Payment Method', 'Description', 'Tags'];
   
   const rows = transactions.map(t => [
     t.id,
-    t.date,
+    formatDateDDMMYYYY(t.date),
     t.type.toUpperCase(),
     `"${(t.category || '').replace(/"/g, '""')}"`,
     t.amount.toFixed(2),
-    `"${(t.paymentMethod || '').replace(/"/g, '""')}"`,
+    `"${normalizePaymentMethod(t.paymentMethod)}"`,
     `"${(t.description || '').replace(/"/g, '""')}"`,
     `"${(t.tags ? t.tags.join(', ') : '').replace(/"/g, '""')}"`
   ]);

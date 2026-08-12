@@ -5,7 +5,7 @@ import { FinanceStore } from '../utils/store';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function AnalyticsView({ transactions, theme }) {
+export default function AnalyticsView({ transactions, theme, currency = '₹' }) {
   const isDark = theme !== 'light';
   const textColor = isDark ? '#f8fafc' : '#0f172a';
 
@@ -64,7 +64,7 @@ export default function AnalyticsView({ transactions, theme }) {
                 {breakdown.map(item => (
                   <tr key={item.category}>
                     <td><strong>{item.category}</strong></td>
-                    <td>₹{item.amount.toFixed(2)}</td>
+                    <td>{currency}{item.amount.toFixed(2)}</td>
                     <td>{totalExpense > 0 ? ((item.amount / totalExpense) * 100).toFixed(1) : 0}%</td>
                   </tr>
                 ))}

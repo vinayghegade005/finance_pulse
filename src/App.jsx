@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { FinanceStore } from './utils/store';
+import { normalizePaymentMethod } from './utils/formatters';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import MetricCards from './components/MetricCards';
@@ -19,7 +20,9 @@ export default function App() {
   const [appData, setAppData] = useState(() => FinanceStore.loadData());
   const [currentView, setCurrentView] = useState('dashboard');
   const [theme, setTheme] = useState(() => appData.settings?.theme || 'dark');
-  
+  const currency = appData.settings?.currency || '₹';
+  const [dashboardAccountFilter, setDashboardAccountFilter] = useState('all'); // 'all', 'bank', 'cash'
+
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [isAddBudgetOpen, setIsAddBudgetOpen] = useState(false);
   const [isAddRecOpen, setIsAddRecOpen] = useState(false);
@@ -39,6 +42,18 @@ export default function App() {
     setTheme(next);
     const updated = { ...appData, settings: { ...appData.settings, theme: next } };
     saveState(updated);
+  };
+
+  const handleCurrencyChange = (newCurrency) => {
+    const updated = {
+      ...appData,
+      settings: {
+        ...(appData.settings || {}),
+        currency: newCurrency
+      }
+    };
+    saveState(updated);
+    showToast(`Currency changed to ${newCurrency}`);
   };
 
   const showToast = (message) => {
@@ -88,6 +103,14 @@ export default function App() {
     showToast('Recurring rule removed');
   };
 
+  // Compute dashboard transactions filtered by account selection (all, bank, cash)
+  const dashboardTransactions = appData.transactions.filter(t => {
+    const method = normalizePaymentMethod(t.paymentMethod);
+    if (dashboardAccountFilter === 'bank') return method === 'Bank Account';
+    if (dashboardAccountFilter === 'cash') return method === 'Cash';
+    return true;
+  });
+
   return (
     <div className="app-container">
       <Sidebar
@@ -100,15 +123,23 @@ export default function App() {
       <main className="main-wrapper">
         <Header
           currentView={currentView}
+          currency={currency}
+          onCurrencyChange={handleCurrencyChange}
         />
 
         <div className="content-body">
-          <MetricCards transactions={appData.transactions} />
+          <MetricCards
+            transactions={currentView === 'dashboard' ? dashboardTransactions : appData.transactions}
+            currency={currency}
+            accountFilter={dashboardAccountFilter}
+            onAccountFilterChange={currentView === 'dashboard' ? setDashboardAccountFilter : null}
+          />
 
           {currentView === 'dashboard' && (
             <DashboardView
-              transactions={appData.transactions}
+              transactions={dashboardTransactions}
               theme={theme}
+              currency={currency}
               onSwitchView={setCurrentView}
             />
           )}
@@ -116,6 +147,7 @@ export default function App() {
           {currentView === 'transactions' && (
             <TransactionsView
               transactions={appData.transactions}
+              currency={currency}
               onDeleteTx={handleDeleteTx}
             />
           )}
@@ -124,6 +156,7 @@ export default function App() {
             <BudgetsView
               budgets={appData.budgets}
               transactions={appData.transactions}
+              currency={currency}
               onOpenAddBudget={() => setIsAddBudgetOpen(true)}
             />
           )}
@@ -131,6 +164,7 @@ export default function App() {
           {currentView === 'recurring' && (
             <RecurringView
               recurring={appData.recurring || []}
+              currency={currency}
               onDeleteRec={handleDeleteRec}
               onOpenAddRec={() => setIsAddRecOpen(true)}
             />
@@ -140,6 +174,7 @@ export default function App() {
             <AnalyticsView
               transactions={appData.transactions}
               theme={theme}
+              currency={currency}
             />
           )}
 
@@ -154,8 +189,8 @@ export default function App() {
       </main>
 
       {/* Floating Bottom Add Transaction Button */}
-      <button 
-        className="btn btn-primary fab-add-btn" 
+      <button
+        className="btn btn-primary fab-add-btn"
         onClick={() => setIsAddTxOpen(true)}
         title="Add New Transaction"
       >
@@ -168,18 +203,21 @@ export default function App() {
         isOpen={isAddTxOpen}
         onClose={() => setIsAddTxOpen(false)}
         onSave={handleAddTx}
+        currency={currency}
       />
 
       <AddBudgetModal
         isOpen={isAddBudgetOpen}
         onClose={() => setIsAddBudgetOpen(false)}
         onSave={handleSaveBudget}
+        currency={currency}
       />
 
       <AddRecurringModal
         isOpen={isAddRecOpen}
         onClose={() => setIsAddRecOpen(false)}
         onSave={handleAddRec}
+        currency={currency}
       />
 
       <Toast toasts={toasts} />

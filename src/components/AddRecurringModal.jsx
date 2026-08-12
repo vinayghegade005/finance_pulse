@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { DEFAULT_CATEGORIES } from '../utils/store';
 
-export default function AddRecurringModal({ isOpen, onClose, onSave }) {
+export default function AddRecurringModal({ isOpen, onClose, onSave, currency = '₹' }) {
   if (!isOpen) return null;
 
   const [type, setType] = useState('expense');
@@ -47,7 +47,7 @@ export default function AddRecurringModal({ isOpen, onClose, onSave }) {
             </div>
 
             <div className="form-group">
-              <label>Amount (₹)</label>
+              <label>Amount ({currency})</label>
               <input type="number" step="0.01" min="0.01" className="form-input" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" required />
             </div>
           </div>

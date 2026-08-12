@@ -1,10 +1,25 @@
 import React from 'react';
-import { FileSpreadsheet, Download, Upload, RotateCcw } from 'lucide-react';
+import { FileSpreadsheet, Download, Upload, RotateCcw, Globe } from 'lucide-react';
 import { exportToCSV, exportToJSON, importFromJSON } from '../utils/exportUtils';
+import { CURRENCIES } from '../utils/store';
 
 export default function SettingsView({ appData, setAppData, showToast }) {
+  const currency = appData.settings?.currency || '₹';
+
+  const handleCurrencyChange = (newCurrency) => {
+    const updated = {
+      ...appData,
+      settings: {
+        ...appData.settings,
+        currency: newCurrency
+      }
+    };
+    setAppData(updated);
+    showToast(`Currency updated to ${newCurrency}`);
+  };
+
   const handleExportCSV = () => {
-    exportToCSV(appData.transactions);
+    exportToCSV(appData.transactions, currency);
     showToast('CSV report downloaded successfully!');
   };
 
@@ -35,6 +50,47 @@ export default function SettingsView({ appData, setAppData, showToast }) {
 
   return (
     <div className="page-view active">
+      {/* Currency Preferences Section */}
+      <div className="section-card" style={{ marginBottom: '28px' }}>
+        <div className="section-header">
+          <div>
+            <h3>Currency & Preferences</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Choose your preferred currency symbol to format all income, expenses, and budget limits across the dashboard.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginTop: '16px' }}>
+          {CURRENCIES.map(c => (
+            <div
+              key={c.code}
+              onClick={() => handleCurrencyChange(c.symbol)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justify: 'space-between',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: currency === c.symbol ? 'var(--accent-primary-light)' : 'var(--bg-surface)',
+                border: currency === c.symbol ? '1.5px solid var(--accent-primary)' : 'var(--glass-border)',
+                cursor: 'pointer',
+                transition: 'var(--transition-fast)'
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{c.name}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Code: {c.code}</div>
+              </div>
+              <span style={{ fontSize: '1.2rem', fontWeight: 800, color: currency === c.symbol ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+                {c.symbol}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Export & Data Management Section */}
       <div className="section-card">
         <h3 style={{ marginBottom: '16px' }}>Export & Data Management</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>

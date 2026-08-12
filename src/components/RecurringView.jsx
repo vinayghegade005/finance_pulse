@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-export default function RecurringView({ recurring, onDeleteRec, onOpenAddRec }) {
+export default function RecurringView({ recurring, currency = '₹', onDeleteRec, onOpenAddRec }) {
   return (
     <div className="page-view active">
       <div className="section-card">
@@ -43,7 +43,7 @@ export default function RecurringView({ recurring, onDeleteRec, onOpenAddRec }) 
                     <td><strong>{r.description}</strong></td>
                     <td><span className="category-tag">{r.category}</span></td>
                     <td className={r.type === 'income' ? 'amount-income' : 'amount-expense'}>
-                      {r.type === 'income' ? '+' : '-'}₹{r.amount.toFixed(2)}
+                      {r.type === 'income' ? '+' : '-'}{currency}{r.amount.toFixed(2)}
                     </td>
                     <td style={{ textTransform: 'capitalize' }}>{r.frequency}</td>
                     <td>{r.lastProcessed || 'N/A'}</td>

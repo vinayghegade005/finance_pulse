@@ -3,10 +3,11 @@ import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, T
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { ArrowRight } from 'lucide-react';
 import { FinanceStore } from '../utils/store';
+import { formatDateDDMMYYYY, normalizePaymentMethod } from '../utils/formatters';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function DashboardView({ transactions, theme, onSwitchView }) {
+export default function DashboardView({ transactions, theme, currency = '₹', onSwitchView }) {
   const isDark = theme !== 'light';
   const textColor = isDark ? '#f8fafc' : '#0f172a';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
@@ -100,7 +101,7 @@ export default function DashboardView({ transactions, theme, onSwitchView }) {
     },
     scales: {
       x: { grid: { display: false }, ticks: { color: textColor } },
-      y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => '₹' + v } }
+      y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => currency + v } }
     }
   };
 
@@ -108,26 +109,6 @@ export default function DashboardView({ transactions, theme, onSwitchView }) {
 
   return (
     <div className="page-view active">
-      <div className="charts-grid">
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3>Cash Flow Trend (Monthly)</h3>
-          </div>
-          <div className="chart-container">
-            <Bar data={barData} options={barOptions} />
-          </div>
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3>Expense Breakdown</h3>
-          </div>
-          <div className="chart-container">
-            <Doughnut data={donutData} options={donutOptions} />
-          </div>
-        </div>
-      </div>
-
       <div className="section-card">
         <div className="section-header">
           <h3>Recent Transactions</h3>
@@ -158,18 +139,38 @@ export default function DashboardView({ transactions, theme, onSwitchView }) {
               ) : (
                 recent.map(t => (
                   <tr key={t.id}>
-                    <td>{t.date}</td>
+                    <td>{formatDateDDMMYYYY(t.date)}</td>
                     <td><strong>{t.description || 'Transaction'}</strong></td>
                     <td><span className="category-tag">{t.category}</span></td>
-                    <td>{t.paymentMethod || 'Cash'}</td>
+                    <td>{normalizePaymentMethod(t.paymentMethod)}</td>
                     <td className={t.type === 'income' ? 'amount-income' : 'amount-expense'}>
-                      {t.type === 'income' ? '+' : '-'}₹{t.amount.toFixed(2)}
+                      {t.type === 'income' ? '+' : '-'}{currency}{t.amount.toFixed(2)}
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="charts-grid">
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Cash Flow Trend (Monthly)</h3>
+          </div>
+          <div className="chart-container">
+            <Bar data={barData} options={barOptions} />
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Expense Breakdown</h3>
+          </div>
+          <div className="chart-container">
+            <Doughnut data={donutData} options={donutOptions} />
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { DEFAULT_CATEGORIES } from '../utils/store';
 
-export default function AddTransactionModal({ isOpen, onClose, onSave }) {
+export default function AddTransactionModal({ isOpen, onClose, onSave, currency = '₹' }) {
   if (!isOpen) return null;
 
   const [type, setType] = useState('expense');
@@ -10,7 +10,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSave }) {
   const [category, setCategory] = useState(DEFAULT_CATEGORIES.expense[0].name);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Credit Card');
+  const [paymentMethod, setPaymentMethod] = useState('Bank Account');
   const [tags, setTags] = useState('');
 
   const allCategories = type === 'income' 
@@ -25,7 +25,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSave }) {
       amount: parseFloat(amount),
       category,
       date,
-      description,
+      description: description.trim() || category,
       paymentMethod,
       tags: tags ? tags.split(',').map(s => s.trim()) : []
     });
@@ -51,7 +51,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSave }) {
             </div>
 
             <div className="form-group">
-              <label>Amount (₹)</label>
+              <label>Amount ({currency})</label>
               <input type="number" step="0.01" min="0.01" className="form-input" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" required />
             </div>
           </div>
@@ -71,19 +71,16 @@ export default function AddTransactionModal({ isOpen, onClose, onSave }) {
           </div>
 
           <div className="form-group">
-            <label>Description / Payee</label>
-            <input type="text" className="form-input" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Grocery Store, Salary" required />
+            <label>Description / Payee (Optional)</label>
+            <input type="text" className="form-input" value={description} onChange={e => setDescription(e.target.value)} placeholder="e.g. Grocery Store, Salary (Optional)" />
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label>Payment Method</label>
               <select className="form-select" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                <option value="Credit Card">Credit Card</option>
-                <option value="Debit Card">Debit Card</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Bank Account">Bank Account</option>
                 <option value="Cash">Cash</option>
-                <option value="PayPal">PayPal</option>
               </select>
             </div>
 

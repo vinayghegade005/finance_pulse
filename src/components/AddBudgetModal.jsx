@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { DEFAULT_CATEGORIES } from '../utils/store';
 
-export default function AddBudgetModal({ isOpen, onClose, onSave }) {
+export default function AddBudgetModal({ isOpen, onClose, onSave, currency = '₹' }) {
   if (!isOpen) return null;
 
   const [category, setCategory] = useState(DEFAULT_CATEGORIES.expense[0].name);
@@ -31,7 +31,7 @@ export default function AddBudgetModal({ isOpen, onClose, onSave }) {
           </div>
 
           <div className="form-group">
-            <label>Monthly Limit (₹)</label>
+            <label>Monthly Limit ({currency})</label>
             <input type="number" step="1" min="1" className="form-input" value={limit} onChange={e => setLimit(e.target.value)} placeholder="e.g. 500" required />
           </div>
 

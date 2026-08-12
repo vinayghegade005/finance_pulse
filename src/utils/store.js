@@ -2,7 +2,21 @@
    FINANCEPULSE - DATA STORE & LOCAL STORAGE MANAGER
    ========================================================================== */
 
+import { normalizePaymentMethod } from './formatters';
+
 const STORAGE_KEY = 'finance_pulse_db_v2';
+
+export const CURRENCIES = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee (₹)' },
+  { code: 'USD', symbol: '$', name: 'US Dollar ($)' },
+  { code: 'EUR', symbol: '€', name: 'Euro (€)' },
+  { code: 'GBP', symbol: '£', name: 'British Pound (£)' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen (¥)' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar (A$)' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar (C$)' },
+  { code: 'AED', symbol: 'AED ', name: 'UAE Dirham (AED)' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar (S$)' }
+];
 
 export const DEFAULT_CATEGORIES = {
   expense: [
@@ -29,7 +43,14 @@ export class FinanceStore {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.transactions)) {
+          parsed.transactions = parsed.transactions.map(t => ({
+            ...t,
+            paymentMethod: normalizePaymentMethod(t.paymentMethod)
+          }));
+        }
+        return parsed;
       } catch (e) {
         console.error("Error loading stored data, returning default seed:", e);
       }
@@ -49,16 +70,16 @@ export class FinanceStore {
     };
 
     const initialTransactions = [
-      { id: 'tx_1', type: 'income', amount: 4800, category: 'Salary & Wages', date: formatDate(14), description: 'Monthly Tech Lead Salary', paymentMethod: 'Bank Transfer', tags: ['Salary', 'Primary'] },
-      { id: 'tx_2', type: 'expense', amount: 1450, category: 'Housing & Rent', date: formatDate(12), description: 'Downtown Apartment Rent', paymentMethod: 'Bank Transfer', tags: ['Housing', 'Fixed'] },
-      { id: 'tx_3', type: 'expense', amount: 240, category: 'Groceries & Dining', date: formatDate(10), description: 'Trader Joe & Whole Foods Groceries', paymentMethod: 'Credit Card', tags: ['Food'] },
-      { id: 'tx_4', type: 'income', amount: 950, category: 'Freelance & Projects', date: formatDate(8), description: 'UI/UX Design Consulting Client', paymentMethod: 'PayPal', tags: ['Side-Hustle'] },
-      { id: 'tx_5', type: 'expense', amount: 75, category: 'Utilities & Bills', date: formatDate(6), description: 'Gigabit Fiber Broadband', paymentMethod: 'Auto-Debit', tags: ['Bills'] },
-      { id: 'tx_6', type: 'expense', amount: 17.99, category: 'Entertainment & Subs', date: formatDate(5), description: 'Netflix Ultra HD Subscription', paymentMethod: 'Credit Card', tags: ['Subscription'] },
-      { id: 'tx_7', type: 'expense', amount: 90, category: 'Transport & Fuel', date: formatDate(4), description: 'Shell Station Premium Fuel', paymentMethod: 'Debit Card', tags: ['Car'] },
-      { id: 'tx_8', type: 'expense', amount: 135, category: 'Shopping & Clothes', date: formatDate(3), description: 'Nike Athletic Wear', paymentMethod: 'Credit Card', tags: ['Fitness'] },
-      { id: 'tx_9', type: 'expense', amount: 110, category: 'Groceries & Dining', date: formatDate(2), description: 'Weekend Restaurant Dinner', paymentMethod: 'Credit Card', tags: ['Dining'] },
-      { id: 'tx_10', type: 'expense', amount: 50, category: 'Health & Medical', date: formatDate(1), description: 'Pharmacy Supplies', paymentMethod: 'Debit Card', tags: ['Health'] }
+      { id: 'tx_1', type: 'income', amount: 4800, category: 'Salary & Wages', date: formatDate(14), description: 'Monthly Tech Lead Salary', paymentMethod: 'Bank Account', tags: ['Salary', 'Primary'] },
+      { id: 'tx_2', type: 'expense', amount: 1450, category: 'Housing & Rent', date: formatDate(12), description: 'Downtown Apartment Rent', paymentMethod: 'Bank Account', tags: ['Housing', 'Fixed'] },
+      { id: 'tx_3', type: 'expense', amount: 240, category: 'Groceries & Dining', date: formatDate(10), description: 'Trader Joe & Whole Foods Groceries', paymentMethod: 'Cash', tags: ['Food'] },
+      { id: 'tx_4', type: 'income', amount: 950, category: 'Freelance & Projects', date: formatDate(8), description: 'UI/UX Design Consulting Client', paymentMethod: 'Bank Account', tags: ['Side-Hustle'] },
+      { id: 'tx_5', type: 'expense', amount: 75, category: 'Utilities & Bills', date: formatDate(6), description: 'Gigabit Fiber Broadband', paymentMethod: 'Bank Account', tags: ['Bills'] },
+      { id: 'tx_6', type: 'expense', amount: 17.99, category: 'Entertainment & Subs', date: formatDate(5), description: 'Netflix Ultra HD Subscription', paymentMethod: 'Bank Account', tags: ['Subscription'] },
+      { id: 'tx_7', type: 'expense', amount: 90, category: 'Transport & Fuel', date: formatDate(4), description: 'Shell Station Premium Fuel', paymentMethod: 'Cash', tags: ['Car'] },
+      { id: 'tx_8', type: 'expense', amount: 135, category: 'Shopping & Clothes', date: formatDate(3), description: 'Nike Athletic Wear', paymentMethod: 'Bank Account', tags: ['Fitness'] },
+      { id: 'tx_9', type: 'expense', amount: 110, category: 'Groceries & Dining', date: formatDate(2), description: 'Weekend Restaurant Dinner', paymentMethod: 'Cash', tags: ['Dining'] },
+      { id: 'tx_10', type: 'expense', amount: 50, category: 'Health & Medical', date: formatDate(1), description: 'Pharmacy Supplies', paymentMethod: 'Cash', tags: ['Health'] }
     ];
 
     const initialBudgets = [
@@ -97,6 +118,22 @@ export class FinanceStore {
     const savingsRate = income > 0 ? ((balance / income) * 100).toFixed(1) : '0';
 
     return { income, expenses, balance, savingsRate };
+  }
+
+  static getAccountMetrics(transactions) {
+    const bankTxs = transactions.filter(t => normalizePaymentMethod(t.paymentMethod) === 'Bank Account');
+    const cashTxs = transactions.filter(t => normalizePaymentMethod(t.paymentMethod) === 'Cash');
+
+    const calc = (txList) => {
+      const income = txList.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const expense = txList.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      return { income, expense, balance: income - expense, count: txList.length };
+    };
+
+    return {
+      bank: calc(bankTxs),
+      cash: calc(cashTxs)
+    };
   }
 
   static getCategoryBreakdown(transactions, type = 'expense') {
