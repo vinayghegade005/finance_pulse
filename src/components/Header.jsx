@@ -9,7 +9,7 @@ export default function Header({ currentView, currency, onCurrencyChange }) {
     budgets: { title: 'Category Budgets', subtitle: 'Set spending caps per category and track your limit progress' },
     recurring: { title: 'Recurring Payments', subtitle: 'Automate tracking for salary, rent, and monthly subscriptions' },
     reports: { title: 'Financial Reports', subtitle: 'Deep dive into expense category breakdowns and visual analytics' },
-    settings: { title: 'Data & Settings', subtitle: 'Currency preferences, CSV spreadsheets, backups, or restore' }
+    settings: { title: 'Settings', subtitle: 'Manage theme appearance, categories, currency preferences, and backups' }
   };
 
   const info = titles[currentView] || titles.dashboard;

@@ -16,7 +16,7 @@ export default function DashboardView({ transactions, theme, currency = '₹', o
   const breakdown = FinanceStore.getCategoryBreakdown(transactions, 'expense');
   const donutLabels = breakdown.map(b => b.category);
   const donutAmounts = breakdown.map(b => b.amount);
-  const colors = ['#3B82F6', '#1B2A41', '#94A3B8', '#60A5FA', '#2563EB', '#1E40AF', '#93C5FD', '#E2E8F0'];
+  const colors = ['#3B82F6', '#106dc9b1', '#94A3B8', '#60A5FA', '#2563EB', '#1E40AF', '#93C5FD', '#E2E8F0'];
 
   const donutData = {
     labels: donutLabels,

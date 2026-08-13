@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, TrendingDown, Landmark, Banknote, Plus, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, TrendingUp, TrendingDown, Landmark, Banknote, Plus, Check, ChevronDown, Search, Trash2, Tag } from 'lucide-react';
 import { DEFAULT_CATEGORIES } from '../utils/store';
 
 export default function AddTransactionModal({ 
@@ -8,7 +8,8 @@ export default function AddTransactionModal({
   onSave, 
   currency = '₹',
   customCategories = { expense: [], income: [] },
-  onAddCustomCategory
+  onAddCustomCategory,
+  onDeleteCustomCategory
 }) {
   if (!isOpen) return null;
 
@@ -20,35 +21,65 @@ export default function AddTransactionModal({
   const [paymentMethod, setPaymentMethod] = useState('Bank Account');
   const [tags, setTags] = useState('');
 
-  // Custom Category Inline Creation State
-  const [isAddingCustomCategory, setIsAddingCustomCategory] = useState(false);
-  const [customCategoryInput, setCustomCategoryInput] = useState('');
+  // Custom Category Dropdown State
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
-  // Build combined list of categories (Default + Custom)
+  const dropdownRef = useRef(null);
+
+  // Build lists of categories
   const defaultList = (type === 'income' 
     ? DEFAULT_CATEGORIES.income.map(c => c.name)
     : DEFAULT_CATEGORIES.expense.map(c => c.name));
 
   const customList = (customCategories && customCategories[type]) || [];
-  const categoryOptions = [...defaultList, ...customList];
+  const allCategoryOptions = [...defaultList, ...customList];
 
-  // Set default category when type or category list changes
+  // Auto-select initial category
   useEffect(() => {
-    if (!category || !categoryOptions.includes(category)) {
-      setCategory(categoryOptions[0] || '');
+    if (!category || !allCategoryOptions.includes(category)) {
+      setCategory(allCategoryOptions[0] || '');
     }
   }, [type, customCategories]);
 
-  const handleSaveCustomCategory = (e) => {
+  // Click outside listener to close category dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+        setIsCreatingCategory(false);
+        setSearchQuery('');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleCreateCategory = (e) => {
     e.preventDefault();
-    const trimmed = customCategoryInput.trim();
+    const trimmed = newCategoryName.trim();
     if (trimmed) {
       if (onAddCustomCategory) {
         onAddCustomCategory(type, trimmed);
       }
       setCategory(trimmed);
-      setCustomCategoryInput('');
-      setIsAddingCustomCategory(false);
+      setNewCategoryName('');
+      setIsCreatingCategory(false);
+      setIsDropdownOpen(false);
+      setSearchQuery('');
+    }
+  };
+
+  const handleDeleteCategory = (e, catName) => {
+    e.stopPropagation();
+    if (onDeleteCustomCategory) {
+      onDeleteCustomCategory(type, catName);
+      if (category === catName) {
+        const remaining = allCategoryOptions.filter(c => c !== catName);
+        setCategory(remaining[0] || '');
+      }
     }
   };
 
@@ -60,7 +91,7 @@ export default function AddTransactionModal({
       id: 'tx_' + Date.now(),
       type,
       amount: parseFloat(amount),
-      category: category || categoryOptions[0],
+      category: category || allCategoryOptions[0],
       date,
       description: description.trim() || category || 'Transaction',
       paymentMethod,
@@ -68,6 +99,10 @@ export default function AddTransactionModal({
     });
     onClose();
   };
+
+  // Filter categories by search query
+  const filteredDefaults = defaultList.filter(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredCustoms = customList.filter(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="modal-overlay active">
@@ -82,7 +117,7 @@ export default function AddTransactionModal({
               color: type === 'income' ? 'var(--accent-income)' : 'var(--accent-expense)',
               display: 'flex',
               alignItems: 'center',
-              justify: 'center'
+              justifyContent: 'center'
             }}>
               {type === 'income' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
             </div>
@@ -101,7 +136,7 @@ export default function AddTransactionModal({
           <div className="type-toggle-grid">
             <div
               className={`type-toggle-card expense ${type === 'expense' ? 'selected' : ''}`}
-              onClick={() => { setType('expense'); setIsAddingCustomCategory(false); }}
+              onClick={() => { setType('expense'); setIsDropdownOpen(false); setIsCreatingCategory(false); }}
             >
               <TrendingDown size={18} />
               <span>Expense Outflow</span>
@@ -109,7 +144,7 @@ export default function AddTransactionModal({
 
             <div
               className={`type-toggle-card income ${type === 'income' ? 'selected' : ''}`}
-              onClick={() => { setType('income'); setIsAddingCustomCategory(false); }}
+              onClick={() => { setType('income'); setIsDropdownOpen(false); setIsCreatingCategory(false); }}
             >
               <TrendingUp size={18} />
               <span>Income Inflow</span>
@@ -135,65 +170,161 @@ export default function AddTransactionModal({
             </div>
           </div>
 
-          {/* Category Dropdown + Custom Category Addition */}
+          {/* Attractive Custom Category Picker */}
           <div className="form-group" style={{ marginBottom: '18px' }}>
             <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Category</label>
-            {!isAddingCustomCategory ? (
-              <div>
-                <select
-                  className="form-select"
-                  value={category}
-                  onChange={e => setCategory(e.target.value)}
-                  style={{ width: '100%' }}
-                >
-                  <optgroup label={`${type === 'income' ? 'Income' : 'Expense'} Categories`}>
-                    {categoryOptions.map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </optgroup>
-                </select>
+            
+            <div className="custom-category-picker-wrapper" ref={dropdownRef}>
+              <button
+                type="button"
+                className={`custom-category-trigger ${isDropdownOpen ? 'open' : ''}`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <div className="custom-category-selected-info">
+                  <div className="custom-category-badge-dot">
+                    <Tag size={15} />
+                  </div>
+                  <span style={{ fontWeight: 600 }}>{category || 'Select Category'}</span>
+                </div>
+                <ChevronDown size={18} style={{
+                  transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease',
+                  color: 'var(--text-muted)'
+                }} />
+              </button>
 
-                <button
-                  type="button"
-                  className="custom-cat-trigger-btn"
-                  onClick={() => setIsAddingCustomCategory(true)}
-                >
-                  <Plus size={14} />
-                  <span>+ Add Custom {type === 'income' ? 'Income' : 'Expense'} Category</span>
-                </button>
-              </div>
-            ) : (
-              <div>
-                <div className="custom-cat-inline-row">
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder={`Name your new ${type} category...`}
-                    value={customCategoryInput}
-                    onChange={e => setCustomCategoryInput(e.target.value)}
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={handleSaveCustomCategory}
-                  >
-                    <Check size={16} />
-                    <span>Add</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => { setIsAddingCustomCategory(false); setCustomCategoryInput(''); }}
-                  >
-                    Cancel
-                  </button>
+              {/* Popover Dropdown Menu */}
+              {isDropdownOpen && (
+                <div className="custom-category-popover">
+                  {/* Search Filter */}
+                  <div className="custom-category-search-box">
+                    <Search size={14} />
+                    <input
+                      type="text"
+                      className="custom-category-search-input"
+                      placeholder="Search or add category..."
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      onClick={e => e.stopPropagation()}
+                      autoFocus
+                    />
+                  </div>
+
+                  {/* Scrollable Category List */}
+                  <div className="custom-category-list-scroll">
+                    {/* Default Categories */}
+                    {filteredDefaults.length > 0 && (
+                      <div>
+                        <div className="custom-category-group-header">Standard Categories</div>
+                        {filteredDefaults.map(cat => (
+                          <div
+                            key={cat}
+                            className={`custom-category-option-item ${category === cat ? 'selected' : ''}`}
+                            onClick={() => {
+                              setCategory(cat);
+                              setIsDropdownOpen(false);
+                              setSearchQuery('');
+                            }}
+                          >
+                            <div className="custom-category-option-left">
+                              <Tag size={14} style={{ opacity: 0.7 }} />
+                              <span>{cat}</span>
+                            </div>
+                            {category === cat && <Check size={16} className="text-accent" />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Custom Categories */}
+                    {filteredCustoms.length > 0 && (
+                      <div style={{ marginTop: '4px' }}>
+                        <div className="custom-category-group-header">Custom Categories</div>
+                        {filteredCustoms.map(cat => (
+                          <div
+                            key={cat}
+                            className={`custom-category-option-item ${category === cat ? 'selected' : ''}`}
+                            onClick={() => {
+                              setCategory(cat);
+                              setIsDropdownOpen(false);
+                              setSearchQuery('');
+                            }}
+                          >
+                            <div className="custom-category-option-left">
+                              <Tag size={14} style={{ color: 'var(--accent-primary)' }} />
+                              <span>{cat}</span>
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              {category === cat && <Check size={16} />}
+                              <button
+                                type="button"
+                                className="custom-category-delete-btn"
+                                title="Delete this custom category"
+                                onClick={(e) => handleDeleteCategory(e, cat)}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {filteredDefaults.length === 0 && filteredCustoms.length === 0 && (
+                      <div style={{ padding: '12px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        No categories found matching "{searchQuery}".
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dropdown Footer: Embedded Add Category Option */}
+                  <div className="custom-category-popover-footer">
+                    {!isCreatingCategory ? (
+                      <button
+                        type="button"
+                        className="custom-category-add-trigger"
+                        onClick={() => setIsCreatingCategory(true)}
+                      >
+                        <Plus size={16} />
+                        <span>+ Add New {type === 'income' ? 'Income' : 'Expense'} Category</span>
+                      </button>
+                    ) : (
+                      <div className="custom-category-add-inline-form">
+                        <div className="custom-category-add-input-row">
+                          <input
+                            type="text"
+                            className="form-input"
+                            style={{ padding: '6px 10px', fontSize: '0.82rem', flex: 1 }}
+                            placeholder={`New ${type} category name...`}
+                            value={newCategoryName}
+                            onChange={e => setNewCategoryName(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') handleCreateCategory(e);
+                            }}
+                            autoFocus
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={handleCreateCategory}
+                          >
+                            <Check size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => { setIsCreatingCategory(false); setNewCategoryName(''); }}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  This category will be saved and selectable for future transactions.
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Payment Account Pills & Date Row */}

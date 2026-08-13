@@ -104,16 +104,63 @@ export default function App() {
   };
 
   const handleAddCustomCategory = (type, categoryName) => {
+    const disabled = appData.disabledCategories || { expense: [], income: [] };
+    const disabledList = disabled[type] || [];
+    let updatedDisabled = disabled;
+
+    if (disabledList.includes(categoryName)) {
+      updatedDisabled = {
+        ...disabled,
+        [type]: disabledList.filter(c => c !== categoryName)
+      };
+    }
+
     const existingCustom = appData.customCategories || { expense: [], income: [] };
     const currentList = existingCustom[type] || [];
+    let updatedCustom = existingCustom;
+
     if (!currentList.includes(categoryName)) {
-      const updatedCustom = {
+      updatedCustom = {
         ...existingCustom,
         [type]: [...currentList, categoryName]
       };
-      saveState({ ...appData, customCategories: updatedCustom });
-      showToast(`Added custom ${type} category: ${categoryName}`);
     }
+
+    saveState({
+      ...appData,
+      customCategories: updatedCustom,
+      disabledCategories: updatedDisabled
+    });
+    showToast(`Added ${type} category: ${categoryName}`);
+  };
+
+  const handleDeleteCategory = (type, categoryName) => {
+    const existingCustom = appData.customCategories || { expense: [], income: [] };
+    const customList = existingCustom[type] || [];
+    let updatedCustom = existingCustom;
+    let updatedDisabled = appData.disabledCategories || { expense: [], income: [] };
+
+    if (customList.includes(categoryName)) {
+      updatedCustom = {
+        ...existingCustom,
+        [type]: customList.filter(c => c !== categoryName)
+      };
+    } else {
+      const disabledList = updatedDisabled[type] || [];
+      if (!disabledList.includes(categoryName)) {
+        updatedDisabled = {
+          ...updatedDisabled,
+          [type]: [...disabledList, categoryName]
+        };
+      }
+    }
+
+    saveState({
+      ...appData,
+      customCategories: updatedCustom,
+      disabledCategories: updatedDisabled
+    });
+    showToast(`Removed ${type} category: ${categoryName}`);
   };
 
   // Compute dashboard transactions filtered by account selection (all, bank, cash)
@@ -141,12 +188,14 @@ export default function App() {
         />
 
         <div className="content-body">
-          <MetricCards
-            transactions={currentView === 'dashboard' ? dashboardTransactions : appData.transactions}
-            currency={currency}
-            accountFilter={dashboardAccountFilter}
-            onAccountFilterChange={currentView === 'dashboard' ? setDashboardAccountFilter : null}
-          />
+          {currentView !== 'settings' && (
+            <MetricCards
+              transactions={currentView === 'dashboard' ? dashboardTransactions : appData.transactions}
+              currency={currency}
+              accountFilter={dashboardAccountFilter}
+              onAccountFilterChange={currentView === 'dashboard' ? setDashboardAccountFilter : null}
+            />
+          )}
 
           {currentView === 'dashboard' && (
             <DashboardView
@@ -195,8 +244,12 @@ export default function App() {
           {currentView === 'settings' && (
             <SettingsView
               appData={appData}
-              setAppData={saveState}
+              saveState={saveState}
               showToast={showToast}
+              theme={theme}
+              toggleTheme={toggleTheme}
+              onAddCategory={handleAddCustomCategory}
+              onDeleteCategory={handleDeleteCategory}
             />
           )}
         </div>
@@ -219,7 +272,9 @@ export default function App() {
         onSave={handleAddTx}
         currency={currency}
         customCategories={appData.customCategories}
+        disabledCategories={appData.disabledCategories}
         onAddCustomCategory={handleAddCustomCategory}
+        onDeleteCustomCategory={handleDeleteCategory}
       />
 
       <AddBudgetModal

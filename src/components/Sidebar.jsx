@@ -18,7 +18,7 @@ export default function Sidebar({ currentView, setCurrentView, theme, toggleThem
     { id: 'budgets', label: 'Budgets', icon: PiggyBank },
     { id: 'recurring', label: 'Recurring', icon: Repeat },
     { id: 'reports', label: 'Analytics', icon: PieChart },
-    { id: 'settings', label: 'Data & Settings', icon: Settings },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
