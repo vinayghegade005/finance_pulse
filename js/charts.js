@@ -21,13 +21,13 @@ export class FinanceCharts {
     const amounts = breakdownData.map(item => item.amount);
 
     const colors = [
-      '#6366f1', '#10b981', '#0ea5e9', '#f59e0b',
-      '#ec4899', '#8b5cf6', '#f43f5e', '#64748b'
+      '#3B82F6', '#1B2A41', '#94A3B8', '#60A5FA',
+      '#2563EB', '#1E40AF', '#93C5FD', '#E2E8F0'
     ];
 
     // Check theme
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    const textColor = isDark ? '#f8fafc' : '#0f172a';
+    const textColor = isDark ? '#E2E8F0' : '#0A0F1E';
 
     this.categoryChartInstance = new Chart(ctx, {
       type: 'doughnut',
@@ -102,8 +102,8 @@ export class FinanceCharts {
     const expenseData = Object.values(monthMap).map(m => m.expense);
 
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-    const textColor = isDark ? '#94a3b8' : '#475569';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+    const textColor = isDark ? '#94A3B8' : '#1B2A41';
+    const gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(0, 0, 0, 0.05)';
 
     this.cashFlowChartInstance = new Chart(ctx, {
       type: 'bar',

@@ -9,14 +9,14 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tool
 
 export default function DashboardView({ transactions, theme, currency = '₹', onSwitchView }) {
   const isDark = theme !== 'light';
-  const textColor = isDark ? '#f0fdf4' : '#092014';
-  const gridColor = isDark ? 'rgba(34, 197, 94, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+  const textColor = isDark ? '#E2E8F0' : '#0A0F1E';
+  const gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(0, 0, 0, 0.05)';
 
   // Prepare Donut Chart Data
   const breakdown = FinanceStore.getCategoryBreakdown(transactions, 'expense');
   const donutLabels = breakdown.map(b => b.category);
   const donutAmounts = breakdown.map(b => b.amount);
-  const colors = ['#2F5D8C', '#123A63', '#10b981', '#0ea5e9', '#f59e0b', '#ec4899', '#8b5cf6', '#C9D6E5'];
+  const colors = ['#3B82F6', '#1B2A41', '#94A3B8', '#60A5FA', '#2563EB', '#1E40AF', '#93C5FD', '#E2E8F0'];
 
   const donutData = {
     labels: donutLabels,
